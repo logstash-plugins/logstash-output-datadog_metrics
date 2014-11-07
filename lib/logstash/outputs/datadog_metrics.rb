@@ -7,7 +7,7 @@ require "stud/buffer"
 # This output lets you send metrics to
 # DataDogHQ based on Logstash events.
 
-# Default queue_size and timeframe are low in order to provide near realtime alerting.
+# Default `queue_size` and `timeframe` are low in order to provide near realtime alerting.
 # If you do not use Datadog for alerting, consider raising these thresholds.
 
 class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
@@ -40,7 +40,7 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
   config :dd_tags, :validate => :array
 
   # How many events to queue before flushing to Datadog
-  # prior to schedule set in @timeframe
+  # prior to schedule set in `@timeframe`
   config :queue_size, :validate => :number, :default => 10
 
   # How often (in seconds) to flush queued events to Datadog

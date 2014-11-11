@@ -1,8 +1,8 @@
 # encoding: utf-8
 require "logstash/outputs/base"
 require "logstash/namespace"
+require "logstash/json"
 require "stud/buffer"
-
 
 # This output lets you send metrics to
 # DataDogHQ based on Logstash events.
@@ -48,7 +48,6 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
 
   public
   def register
-    require 'time'
     require "net/https"
     require "uri"
 
@@ -73,7 +72,7 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
 
     dd_metrics = Hash.new
     dd_metrics['metric'] = event.sprintf(@metric_name)
-    dd_metrics['points'] = [[to_epoch(event.timestamp), event.sprintf(@metric_value).to_f]]
+    dd_metrics['points'] = [[event.timestamp.to_i, event.sprintf(@metric_value).to_f]]
     dd_metrics['type'] = event.sprintf(@metric_type)
     dd_metrics['host'] = event.sprintf(@host)
     dd_metrics['device'] = event.sprintf(@device)
@@ -106,7 +105,7 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
     request = Net::HTTP::Post.new("#{@uri.path}?api_key=#{@api_key}")
 
     begin
-      request.body = dd_series.to_json
+      request.body = LogStash::Json.dump(dd_series)
       request.add_field("Content-Type", 'application/json')
       response = @client.request(request)
       @logger.info("DD convo", :request => request.inspect, :response => response.inspect)
@@ -115,10 +114,5 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
       @logger.warn("Unhandled exception", :request => request.inspect, :response => response.inspect, :exception => e.inspect)
     end
   end # def flush
-
-  private
-  def to_epoch(t)
-    return t.is_a?(Time) ? t.to_i : Time.parse(t).to_i
-  end # def to_epoch
 
 end # class LogStash::Outputs::DatadogMetrics

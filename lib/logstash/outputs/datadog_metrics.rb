@@ -15,7 +15,6 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
   include Stud::Buffer
 
   config_name "datadog_metrics"
-  milestone 1
 
   # Your DatadogHQ API key. https://app.datadoghq.com/account/settings#api
   config :api_key, :validate => :string, :required => true

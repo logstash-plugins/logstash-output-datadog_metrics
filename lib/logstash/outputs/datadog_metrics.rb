@@ -1,6 +1,7 @@
 # encoding: utf-8
 require "logstash/outputs/base"
 require "logstash/namespace"
+require "logstash/json"
 require "stud/buffer"
 
 
@@ -47,7 +48,6 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
 
   public
   def register
-    require 'time'
     require "net/https"
     require "uri"
 
@@ -105,7 +105,7 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
     request = Net::HTTP::Post.new("#{@uri.path}?api_key=#{@api_key}")
 
     begin
-      request.body = dd_series.to_json
+      request.body = series_to_json(dd_series)
       request.add_field("Content-Type", 'application/json')
       response = @client.request(request)
       @logger.info("DD convo", :request => request.inspect, :response => response.inspect)
@@ -116,8 +116,13 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
   end # def flush
 
   private
+
+  def series_to_json(series)
+    LogStash::Json.dump(series)
+  end
+
   def to_epoch(t)
-    return t.is_a?(Time) ? t.to_i : Time.parse(t).to_i
-  end # def to_epoch
+    Integer(t.is_a?(String) ? Time.parse(t) : t)
+  end
 
 end # class LogStash::Outputs::DatadogMetrics

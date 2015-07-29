@@ -117,7 +117,7 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
 
   private
   def to_epoch(t)
-    return t.is_a?(Time) ? t.to_i : Time.parse(t).to_i
+    return t.is_a?(LogStash::Timestamp) ? t.to_i : Time.parse(t).to_i
   end # def to_epoch
 
 end # class LogStash::Outputs::DatadogMetrics

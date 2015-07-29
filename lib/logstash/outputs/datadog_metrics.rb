@@ -10,8 +10,7 @@ require "stud/buffer"
 
 # Default `queue_size` and `timeframe` are low in order to provide near realtime alerting.
 # If you do not use Datadog for alerting, consider raising these thresholds.
-
-class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
+module LogStash module Outputs class DatadogMetrics < LogStash::Outputs::Base
 
   include Stud::Buffer
 
@@ -47,6 +46,7 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
   config :timeframe, :validate => :number, :default => 10
 
   public
+
   def register
     require "net/https"
     require "uri"
@@ -64,7 +64,7 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
     )
   end # def register
 
-  public
+  # public
   def receive(event)
     return unless output?(event)
     return unless @metric_name && @metric_value && @metric_type
@@ -88,7 +88,7 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
     buffer_receive(dd_metrics)
   end # def receive
 
-  public
+  # public
   def flush(events, final=false)
     dd_series = Hash.new
     dd_series['series'] = Array(events).flatten
@@ -116,4 +116,4 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
     Integer(t.is_a?(String) ? Time.parse(t) : t)
   end
 
-end # class LogStash::Outputs::DatadogMetrics
+end end end # class LogStash::Outputs::DatadogMetrics

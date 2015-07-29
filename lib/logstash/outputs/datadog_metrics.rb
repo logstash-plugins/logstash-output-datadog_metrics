@@ -91,16 +91,7 @@ class LogStash::Outputs::DatadogMetrics < LogStash::Outputs::Base
   public
   def flush(events, final=false)
     dd_series = Hash.new
-    dd_series['series'] = []
-
-    events.each do |event|
-      begin
-        dd_series['series'] << event
-      rescue
-        @logger.warn("Error adding event to series!", :exception => e)
-        next
-      end
-    end
+    dd_series['series'] = Array(events).flatten
 
     request = Net::HTTP::Post.new("#{@uri.path}?api_key=#{@api_key}")
 

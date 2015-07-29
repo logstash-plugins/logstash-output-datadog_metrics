@@ -34,20 +34,23 @@ describe LogStash::Outputs::DatadogMetrics do
 
   subject { described_class.new(params) }
 
-  before do
-    expect(http_instance).to receive(:use_ssl=)
-    expect(http_instance).to receive(:verify_mode=)
-    subject.register
-  end
-
   context 'construction' do
     it 'register method calls collaborator methods' do
+      expect(http_instance).to receive(:use_ssl=)
+      expect(http_instance).to receive(:verify_mode=)
+      subject.register
       buffer = subject.instance_variable_get(:@buffer_config)
       expect(buffer[:max_items]).to be 10
     end
   end
 
   context 'runtime' do
+    before do
+      allow(http_instance).to receive(:use_ssl=)
+      allow(http_instance).to receive(:verify_mode=)
+      subject.register
+    end
+
     context 'receiving an event' do
       it 'receives' do
         subject.receive(event)

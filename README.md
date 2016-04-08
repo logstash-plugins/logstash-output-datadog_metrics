@@ -1,7 +1,6 @@
 # Logstash Plugin
 
-[![Build
-Status](http://build-eu-00.elastic.co/view/LS%20Plugins/view/LS%20Outputs/job/logstash-plugin-output-datadog_metrics-unit/badge/icon)](http://build-eu-00.elastic.co/view/LS%20Plugins/view/LS%20Outputs/job/logstash-plugin-output-datadog_metrics-unit/)
+[![Travis Build Status](https://travis-ci.org/logstash-plugins/logstash-output-datadog_metrics.svg)](https://travis-ci.org/logstash-plugins/logstash-output-datadog_metrics)
 
 This is a plugin for [Logstash](https://github.com/elastic/logstash).
 

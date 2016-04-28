@@ -79,6 +79,8 @@ module LogStash module Outputs class DatadogMetrics < LogStash::Outputs::Base
 
     if @dd_tags
       tagz = @dd_tags.collect {|x| event.sprintf(x) }
+    elsif event["dd_tags"]
+      tagz = event["dd_tags"]
     else
       tagz = event["tags"]
     end

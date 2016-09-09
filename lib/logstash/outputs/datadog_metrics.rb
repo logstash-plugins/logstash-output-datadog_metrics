@@ -66,7 +66,6 @@ module LogStash module Outputs class DatadogMetrics < LogStash::Outputs::Base
 
   # public
   def receive(event)
-    
     return unless @metric_name && @metric_value && @metric_type
     return unless ["gauge", "counter"].include? event.sprintf(@metric_type)
 
@@ -80,7 +79,7 @@ module LogStash module Outputs class DatadogMetrics < LogStash::Outputs::Base
     if @dd_tags
       tagz = @dd_tags.collect {|x| event.sprintf(x) }
     else
-      tagz = event["tags"]
+      tagz = event.get("tags")
     end
     dd_metrics['tags'] = tagz if tagz
 

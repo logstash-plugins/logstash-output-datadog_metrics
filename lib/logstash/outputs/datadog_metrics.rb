@@ -71,7 +71,7 @@ module LogStash module Outputs class DatadogMetrics < LogStash::Outputs::Base
 
     dd_metrics = Hash.new
     dd_metrics['metric'] = event.sprintf(@metric_name)
-    dd_metrics['points'] = [[to_epoch(event.timestamp), event.sprintf(@metric_value).to_f]]
+    dd_metrics['points'] = [[to_epoch(LogStash::Timestamp.now), event.sprintf(@metric_value).to_f]]
     dd_metrics['type'] = event.sprintf(@metric_type)
     dd_metrics['host'] = event.sprintf(@host)
     dd_metrics['device'] = event.sprintf(@device)
@@ -89,6 +89,19 @@ module LogStash module Outputs class DatadogMetrics < LogStash::Outputs::Base
 
   # public
   def flush(events, final=false)
+    if @metric_type == 'counter'
+      aggregated_events = Hash.new
+      aggregated_events = Array(events).flatten.reduce(Hash.new) { |result, event|
+        key = series_to_json(event)
+        if result[key]
+          result[key]['points'][0][1] += 1
+        else
+          result[key] = event
+        end
+        result
+      }
+      events = aggregated_events.values
+    end
     dd_series = Hash.new
     dd_series['series'] = Array(events).flatten
 

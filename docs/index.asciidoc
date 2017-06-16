@@ -14,7 +14,7 @@ END - GENERATED VARIABLES, DO NOT EDIT!
 
 [id="plugins-{type}-{plugin}"]
 
-=== Datadog_metrics
+=== Datadog_metrics output plugin
 
 include::{include_path}/plugin_header.asciidoc[]
 

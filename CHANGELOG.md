@@ -1,3 +1,6 @@
+## 3.0.2
+  - Fix some documentation issues
+
 ## 3.0.0
   - Update to the new logstash event api
   - update the travis file

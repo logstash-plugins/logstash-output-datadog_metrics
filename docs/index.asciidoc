@@ -1,5 +1,6 @@
 :plugin: datadog_metrics
 :type: output
+:default_codec: plain
 
 ///////////////////////////////////////////
 START - GENERATED VARIABLES, DO NOT EDIT!
@@ -128,3 +129,5 @@ How often (in seconds) to flush queued events to Datadog
 
 [id="plugins-{type}s-{plugin}-common-options"]
 include::{include_path}/{type}.asciidoc[]
+
+:default_codec!:

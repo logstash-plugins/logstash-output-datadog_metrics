@@ -45,7 +45,7 @@ module LogStash module Outputs class DatadogMetrics < LogStash::Outputs::Base
   # How often (in seconds) to flush queued events to Datadog
   config :timeframe, :validate => :number, :default => 10
 
-  # api endpoint may vary for EU customers (ex: https://api.datadoghq.eu/api/v1/series)
+  # api endpoint may vary for EU customers
   config :api_url, :validate => :string, :default => "https://api.datadoghq.com/api/v1/series"
 
   public

@@ -66,7 +66,7 @@ Your DatadogHQ API key. https://app.datadoghq.com/account/settings#api
   * Value type is <<string,string>>
   * Default value is `"https://api.datadoghq.com/api/v1/series"`
 
-Set the api endpoint for Datadog EU Site users ("https://api.datadoghq.eu/api/v1/series")
+Set the api endpoint for Datadog EU Site users
 
 [id="plugins-{type}s-{plugin}-dd_tags"]
 ===== `dd_tags` 

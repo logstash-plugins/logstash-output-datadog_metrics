@@ -8,23 +8,25 @@ describe LogStash::Outputs::DatadogMetrics do
 
   let(:json_obj) { double('json_obj') }
   let(:logger) { double('logger') }
-  let(:ddtags) { ['foo', 'bar'] }
+  let(:dd_tags) { ['foo', 'bar'] }
+  let(:event_dd_tags) { ['test', 'other'] }
   let(:event_hash) do
     {
       'message' => 'Hello world!',
       'source' => 'datadog-metrics',
       'type' => 'generator',
       'host' => 'localhost',
-      '@timestamp' => LogStash::Timestamp.now
+      '@timestamp' => LogStash::Timestamp.now,
+      'dd_tags' => event_dd_tags,
     }
   end
   let(:event)  { LogStash::Event.new(event_hash) }
   let(:params) do
     {
       'api_key' => '123456789',
-      'dd_tags' => ddtags,
+      'dd_tags' => dd_tags,
       'metric_type' => 'gauge'
-    }
+    }.reject { |k, v| v.nil? }
   end
 
   before do
@@ -52,10 +54,22 @@ describe LogStash::Outputs::DatadogMetrics do
     end
 
     context 'receiving an event' do
-      it 'receives' do
-        subject.receive(event)
-        buffer = subject.instance_variable_get(:@buffer_state)
-        expect(buffer[:pending_items].inspect).to match(/"tags"=>\["foo", "bar"\]/)
+      context 'when @dd_tags is set' do
+        it 'receives and has precedence' do
+          subject.receive(event)
+          buffer = subject.instance_variable_get(:@buffer_state)
+          expect(buffer[:pending_items].inspect).to match(/"tags"=>\["foo", "bar"\]/)
+        end
+      end
+
+      context 'when @dd_tags is not set but event[dd_tags] is' do
+        let(:dd_tags) { nil }
+
+        it 'receives' do
+          subject.receive(event)
+          buffer = subject.instance_variable_get(:@buffer_state)
+          expect(buffer[:pending_items].inspect).to match(/"tags"=>\["test", "other"\]/)
+        end
       end
     end
 

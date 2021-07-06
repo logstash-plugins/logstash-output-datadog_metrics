@@ -45,14 +45,16 @@ module LogStash module Outputs class DatadogMetrics < LogStash::Outputs::Base
   # How often (in seconds) to flush queued events to Datadog
   config :timeframe, :validate => :number, :default => 10
 
+  # api endpoint may vary for EU customers
+  config :api_url, :validate => :string, :default => "https://api.datadoghq.com/api/v1/series"
+
   public
 
   def register
     require "net/https"
     require "uri"
 
-    @url = "https://app.datadoghq.com/api/v1/series"
-    @uri = URI.parse(@url)
+    @uri = URI.parse(@api_url)
     @client = Net::HTTP.new(@uri.host, @uri.port)
     @client.use_ssl = true
     @client.verify_mode = OpenSSL::SSL::VERIFY_NONE

@@ -1,4 +1,4 @@
-## 3.0.4
+## 3.0.5
   - Change `api_key` config type to `password` to prevent leaking in debug logs [#18](https://github.com/logstash-plugins/logstash-output-datadog_metrics/pull/18)
 
 ## 3.0.4

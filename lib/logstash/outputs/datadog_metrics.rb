@@ -17,7 +17,7 @@ module LogStash module Outputs class DatadogMetrics < LogStash::Outputs::Base
   config_name "datadog_metrics"
 
   # Your DatadogHQ API key. https://app.datadoghq.com/account/settings#api
-  config :api_key, :validate => :string, :required => true
+  config :api_key, :validate => :password, :required => true
 
   # The name of the time series.
   config :metric_name, :validate => :string, :default => "%{metric_name}"
@@ -92,7 +92,7 @@ module LogStash module Outputs class DatadogMetrics < LogStash::Outputs::Base
     dd_series = Hash.new
     dd_series['series'] = Array(events).flatten
 
-    request = Net::HTTP::Post.new("#{@uri.path}?api_key=#{@api_key}")
+    request = Net::HTTP::Post.new("#{@uri.path}?api_key=#{@api_key.value}")
 
     begin
       request.body = series_to_json(dd_series)

@@ -15,7 +15,7 @@ describe LogStash::Outputs::DatadogMetrics do
       'source' => 'datadog-metrics',
       'type' => 'generator',
       'host' => 'localhost',
-      '@timestamp' => LogStash::Timestamp.now
+      '@timestamp' => LogStash::Timestamp.now - 1000
     }
   end
   let(:event)  { LogStash::Event.new(event_hash) }
@@ -56,15 +56,45 @@ describe LogStash::Outputs::DatadogMetrics do
         subject.receive(event)
         buffer = subject.instance_variable_get(:@buffer_state)
         expect(buffer[:pending_items].inspect).to match(/"tags"=>\["foo", "bar"\]/)
+        expect(buffer[:pending_items].inspect).to match(/"points"=>\[\[#{LogStash::Timestamp.now.to_i}, 0.0\]\]/)
       end
     end
 
-    context 'flushing multiple events' do
+    context 'flushing multiple counter events' do
       before do
-        series_hash = {'series' => Array(event)}
+        event_time = LogStash::Timestamp.now
+        @dd_metric11 = {
+          'metric' => 'metric1',
+          'points' => [[event_time.to_i, 1.0]],
+          'type' => 'counter',
+          'host' => 'localhost',
+          'device' => 'device',
+          'tags' => ['tag1', 'tag2']
+        }
+        @dd_metric21 = {
+          'metric' => 'metric1',
+          'points' => [[event_time.to_i - 1, 1.0]],
+          'type' => 'counter',
+          'host' => 'localhost',
+          'device' => 'device',
+          'tags' => ['tag1', 'tag2']
+        }
+        series_hash = {'series' => [@dd_metric11, @dd_metric11, @dd_metric21]}
         subject.instance_variable_set(:@logger, logger)
-        expect(LogStash::Json).to receive(:dump).with(series_hash).and_return('---')
-        expect(request).to receive(:body=)
+        subject.instance_variable_set(:@metric_type, 'counter')
+        expect(request).to receive(:body=).with(LogStash::Json.dump({
+          series: [ { metric: 'metric1',
+                      points: [[ event_time.to_i, 2.0 ]],
+                      type: 'counter',
+                      host: 'localhost',
+                      device: 'device',
+                      tags: [ 'tag1', 'tag2' ] },
+                    { metric: 'metric1',
+                      points: [[ event_time.to_i - 1, 1.0 ]],
+                      type: 'counter',
+                      host: 'localhost',
+                      device: 'device',
+                      tags: [ 'tag1', 'tag2' ] } ] }))
         expect(request).to receive(:add_field)
         expect(logger).to receive(:info).at_least(:once)
         expect(logger).not_to receive(:warn)
@@ -73,12 +103,62 @@ describe LogStash::Outputs::DatadogMetrics do
         expect(response).to receive(:code).and_return('202')
       end
 
-      it 'flushes final=false [final is unused]' do
-        expect{subject.flush([event], false)}.not_to raise_error
+      it 'flushes and aggregate identical events' do
+        subject.flush([@dd_metric11, @dd_metric11, @dd_metric21], false)
+      end
+    end
+
+    context 'flushing multiple gauge events' do
+      before do
+        event_time = LogStash::Timestamp.now
+        @dd_metric11 = {
+          'metric' => 'metric1',
+          'points' => [[event_time.to_i, 1.0]],
+          'type' => 'gauge',
+          'host' => 'localhost',
+          'device' => 'device',
+          'tags' => ['tag1', 'tag2']
+        }
+        @dd_metric21 = {
+          'metric' => 'metric1',
+          'points' => [[event_time.to_i - 1, 1.0]],
+          'type' => 'gauge',
+          'host' => 'localhost',
+          'device' => 'device',
+          'tags' => ['tag1', 'tag2']
+        }
+        series_hash = {'series' => [@dd_metric11, @dd_metric11, @dd_metric21]}
+        subject.instance_variable_set(:@logger, logger)
+        subject.instance_variable_set(:@metric_type, 'gauge')
+        expect(request).to receive(:body=).with(LogStash::Json.dump({
+          series: [ { metric: 'metric1',
+                      points: [[ event_time.to_i, 1.0 ]],
+                      type: 'gauge',
+                      host: 'localhost',
+                      device: 'device',
+                      tags: [ 'tag1', 'tag2' ] }, 
+                    { metric: 'metric1',
+                      points: [[ event_time.to_i, 1.0 ]],
+                      type: 'gauge',
+                      host: 'localhost',
+                      device: 'device',
+                      tags: [ 'tag1', 'tag2' ] },
+                    { metric: 'metric1',
+                      points: [[ event_time.to_i - 1, 1.0 ]],
+                      type: 'gauge',
+                      host: 'localhost',
+                      device: 'device',
+                      tags: [ 'tag1', 'tag2' ] } ] }))
+        expect(request).to receive(:add_field)
+        expect(logger).to receive(:info).at_least(:once)
+        expect(logger).not_to receive(:warn)
+        expect(http_instance).to receive(:request).with(request).and_return(response)
+
+        expect(response).to receive(:code).and_return('202')
       end
 
-      it 'flushes final=true [final is unused]' do
-        expect{subject.flush([event], true)}.not_to raise_error
+      it 'flushes and send all events as is' do
+        subject.flush([@dd_metric11, @dd_metric11, @dd_metric21], false)
       end
     end
   end

@@ -1,3 +1,6 @@
+## 3.0.6
+  - Add `api_url` config option to allow usage in different regions [#13](https://github.com/logstash-plugins/logstash-output-datadog_metrics/pull/13)
+
 ## 3.0.5
   - Change `api_key` config type to `password` to prevent leaking in debug logs [#18](https://github.com/logstash-plugins/logstash-output-datadog_metrics/pull/18)
 

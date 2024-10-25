@@ -1,3 +1,6 @@
+## 3.0.7
+  - move every message logging to debug [#11](https://github.com/logstash-plugins/logstash-output-datadog_metrics/pull/11)
+
 ## 3.0.6
   - Add `api_url` config option to allow usage in different regions [#13](https://github.com/logstash-plugins/logstash-output-datadog_metrics/pull/13)
 

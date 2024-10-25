@@ -83,4 +83,10 @@ describe LogStash::Outputs::DatadogMetrics do
     end
   end
 
+  describe "debugging `api_key`" do
+    it "should not show origin value" do
+      expect(subject.logger).to receive(:debug).with('<password>')
+      subject.logger.send(:debug, subject.api_key.to_s)
+    end
+  end
 end

@@ -1,5 +1,17 @@
-## 3.0.3
+## 3.0.7
   - move every message logging to debug [#11](https://github.com/logstash-plugins/logstash-output-datadog_metrics/pull/11)
+
+## 3.0.6
+  - Add `api_url` config option to allow usage in different regions [#13](https://github.com/logstash-plugins/logstash-output-datadog_metrics/pull/13)
+
+## 3.0.5
+  - Change `api_key` config type to `password` to prevent leaking in debug logs [#18](https://github.com/logstash-plugins/logstash-output-datadog_metrics/pull/18)
+
+## 3.0.4
+  - Docs: Set the default_codec doc attribute.
+
+## 3.0.3
+  - Update gemspec summary
 
 ## 3.0.2
   - Fix some documentation issues

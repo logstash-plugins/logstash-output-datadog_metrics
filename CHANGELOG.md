@@ -1,3 +1,6 @@
+## 3.0.3
+  - move every message logging to debug [#11](https://github.com/logstash-plugins/logstash-output-datadog_metrics/pull/11)
+
 ## 3.0.2
   - Fix some documentation issues
 
